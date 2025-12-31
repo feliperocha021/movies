@@ -10,8 +10,8 @@ export const userApi = createApi({
       query: () => "/users",
     }),
 
-    getUserById: builder.query<UserResponse, number>({
-      query: (id: number) => `/users/${id}`
+    getUserById: builder.query<UserResponse, string>({
+      query: (id: string) => `/users/${id}`
     }),
 
     updateMe: builder.mutation<UserResponse, UpdateRequest>({

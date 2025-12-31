@@ -12,6 +12,11 @@ export interface SignupRequest {
   password: string
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 /* Response */
 export interface LogoutResponse {
   success: boolean;

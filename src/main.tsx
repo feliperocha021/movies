@@ -12,6 +12,8 @@ import Register from './pages/Auth/Register.tsx'
 import PrivateRoute from './pages/Auth/PrivateRoute.tsx'
 import Profile from './pages/Auth/Profile.tsx'
 import ChangePassword from './pages/Auth/ChangePassword.tsx'
+import AdminRoute from './pages/Admin/AdminRoute.tsx'
+import GenreList from './pages/Admin/GenreList.tsx'
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,12 @@ const router = createBrowserRouter([
           { path: "profile", element: <Profile /> },
           { path: "change-password", element: <ChangePassword /> }
         ],
+      },
+      {
+        element: <AdminRoute />,
+        children: [
+          { path: "/admin/movies/genre", element: <GenreList /> }
+        ]
       },
     ],
   },

@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import type { LoginResponse, LoginRequest, SignupRequest, LogoutResponse } from "../../interfaces/auth";
+import type { LoginResponse, LoginRequest, SignupRequest, LogoutResponse, ChangePasswordRequest } from "../../interfaces/auth";
 import { baseQueryWithReauth } from "./baseQueryWithReauth";
 
 export const authApi = createApi({
@@ -43,6 +43,13 @@ export const authApi = createApi({
       }),
     }),
 
+    changePassword: builder.mutation<LoginResponse, ChangePasswordRequest>({
+      query:(passwords) => ({
+        url: "/auth/change-password",
+        method: "PUT",
+        body: passwords,
+      }),
+    }),
   }),
 });
 
@@ -52,4 +59,5 @@ export const {
   useRefreshMutation,
   useLogoutMutation,
   useLogoutAllMutation,
+  useChangePasswordMutation,
 } = authApi;
