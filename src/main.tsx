@@ -14,6 +14,7 @@ import Profile from './pages/Auth/Profile.tsx'
 import ChangePassword from './pages/Auth/ChangePassword.tsx'
 import AdminRoute from './pages/Admin/AdminRoute.tsx'
 import GenreList from './pages/Admin/GenreList.tsx'
+import CreateMovie from './pages/Admin/CreateMovie.tsx'
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,8 @@ const router = createBrowserRouter([
       {
         element: <AdminRoute />,
         children: [
-          { path: "/admin/movies/genre", element: <GenreList /> }
+          { path: "/admin/movies/genre", element: <GenreList /> },
+          { path: "/admin/movies/create", element: <CreateMovie /> }
         ]
       },
     ],
