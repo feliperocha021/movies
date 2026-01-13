@@ -12,7 +12,7 @@ export const uploadApi = createApi({
         formData.append("image", file);
 
         return {
-          url: "/upload",
+          url: "/uploads",
           method: "POST",
           body: formData,
         };

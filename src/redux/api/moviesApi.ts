@@ -38,11 +38,11 @@ export const movieApi = createApi({
       }),
     }),
 
-    getMovieById: builder.query<MoviesResponse, string>({
+    getMovieById: builder.query<MovieResponse, string>({
       query: (id: string) => `/movies/${id}`
     }),
 
-    updateMovie: builder.mutation<MovieResponse,{ id: string, movieUpdated: MovieRequest }>({
+    updateMovie: builder.mutation<MovieResponse, { id: string, movieUpdated: MovieRequest }>({
       query: ({ id, movieUpdated }) => ({
         url: `/movies/${id}`,
         method: "PUT",

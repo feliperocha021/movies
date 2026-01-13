@@ -1,99 +1,125 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCreateMovieMutation } from "../../redux/api/moviesApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { 
+  useGetMovieByIdQuery,
+  useUpdateMovieMutation,
+  useDeleteMovieMutation,
+} from "../../redux/api/moviesApi"
 import { useUploadSingleImageMutation } from "../../redux/api/uploadApi";
-import { useGetAllGenresQuery } from "../../redux/api/genreApi";
 import { toast } from "react-toastify";
+import type { MovieFormValues } from "./CreateMovie";
 import { useFieldArray, useForm } from "react-hook-form";
-import type { MovieRequest } from "../../interfaces/movie";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createMovieSchema } from "../../validators/createMovieSchema";
+import { updateMovieSchema } from "../../validators/updateMovieShecma";
+import { useState, useEffect } from "react";
 import { getErrorMessage } from "../../utils/errorHandler";
+import type { MovieRequest } from "../../interfaces/movie";
+import { useGetAllGenresQuery } from "../../redux/api/genreApi";
 
-export type MovieFormValues = Omit<MovieRequest, "cast"> & {
-  cast: { name: string }[];
-};
-
-const CreateMovie = () => {
+const UpdateMovie = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { register, handleSubmit, reset, setValue, control, formState: { errors } } = useForm<MovieFormValues>({
-    defaultValues: {
-      name: "",
-      image: "",
-      year: 0,
-      details: "",
-      cast: [{ name: "" }],
-      reviews: [],
-      numReviews: 0,
-      genre: "",
-    },
-    resolver: zodResolver(createMovieSchema),
-  });
+
+  const { data, isLoading, error } = useGetMovieByIdQuery(id!, { skip: !id });
+
+  const movie = data?.data.movie;
+
+  const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
+
+  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<MovieFormValues>({
+    resolver: zodResolver(updateMovieSchema)
+  })
+
+  const [ uploadImage, { isLoading: isUploadingImage } ] = useUploadSingleImageMutation();
+  const [ updateMovie, { isLoading: isUpdatingMovie } ] = useUpdateMovieMutation();
+  const [ deleteMovie, { isLoading: isDeletingMovie } ] = useDeleteMovieMutation();
+  const { data: genres, isLoading: isLoadingGenres } = useGetAllGenresQuery();
+
+  useEffect(() => {
+    if (movie && genres?.data.genres) {
+      reset({
+        name: movie.name,
+        image: movie.image,
+        cast: movie.cast.map(c => ({ name: c })),
+        details: movie.details,
+        genre: movie.genre,
+        numReviews: movie.numReviews,
+        reviews: movie.reviews,
+        year: movie.year,
+      });
+    }
+  }, [movie, genres, reset])
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "cast",
-  });
+  })
 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [ createMovie, { isLoading: isCreatingMovie } ] = useCreateMovieMutation();
-  const [ uploadImage, { isLoading: isUploadingImage } ] = useUploadSingleImageMutation();
-  const { data: genres, isLoading: isLoadingGenres } = useGetAllGenresQuery();
-
-  useEffect(() => {
-    if (genres && genres.data.genres.length > 0) {
-      setValue("genre", genres.data.genres[0].id);
-    }
-  }, [genres, setValue]);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setSelectedImage(file);
+  };
 
   const onSubmit = async (data: MovieFormValues) => {
     try {
-      console.log(data);
-      let filename = data.image;
-
-      if (selectedImage) {
-        const response = await uploadImage(selectedImage).unwrap();
-        filename = "http://localhost:3000/" +  response.data.file.path;
+      if (!id) {
+        toast.error("Movie Not Found");
+        return;
       }
 
-      const payload: MovieRequest = {
+      let filename = data.image;
+
+      if (selectedImage && selectedImage instanceof File) {
+        const response = await uploadImage(selectedImage).unwrap();
+        filename = "http://localhost:3000/" + response.data.file.path;
+      }
+
+      const movieUpdated: MovieRequest = {
         ...data,
-        cast: data.cast.map(c => c.name),
+        cast: data.cast.map((c) => c.name ),
         image: filename,
       };
 
-      await createMovie(payload).unwrap();
-      toast.success("Movie created successfully");
-      reset();
-      setSelectedImage(null);
-      navigate("/admin/movies-list");
+      await updateMovie({id, movieUpdated}).unwrap();
+      toast.success("Movie updated successfully");
+      setSelectedImage(undefined);
+      navigate("/movies");
     } catch (err) {
       const message = getErrorMessage(err);
       toast.error(message);
       console.error(err);
     }
-  };
+  }
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
+  const handleDeleteMovie = async() => {
+    try {
+      if (!id) {
+        toast.error("Movie Not Found");
+        return;
+      }
+      await deleteMovie(id).unwrap();
+      toast.success("Movie deleted successfully");
+      navigate("/movies");
+    } catch(err) {
+      const message = getErrorMessage(err);
+      toast.error(message);
+      console.error(err);
     }
   }
+
+  if (isLoading) return <p>Loading Movie</p>
+  if (!data || error) return <p>Movie Not Found</p>
 
   return (
     <div className="container flex justify-center items-center mt-4">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <p className="text-green-200 w-200 text-2xl mb-4">Create Movie</p>
+        <p className="text-green-200 w-200 text-2xl mb-4">Update Movie</p>
         <div className="mb-4">
-          <label 
-            className="block"
-            >
-            Name: 
-            <input
-              className="border px-2 py-1 w-full"
-              type="text" 
+          <label className="block">
+            Name:
+            <input 
+              type="text"
               {...register("name")}
+              className="border px-2 py-1 w-full"
             />
             {errors.name && <p className="text-red-500">{errors.name.message}</p>}
           </label>
@@ -180,31 +206,51 @@ const CreateMovie = () => {
           </label>
         </div>
         <div className="mb-4">
-          <label 
-            className={
-              !selectedImage
-                ? "border border-gray-400 rounded px-2 py-2 cursor-pointer"
-                : "border-0 rounded-none p-0 cursor-pointer"
-            }
-          >
-            {!selectedImage && "Upload Image"}
-            <input 
-              className={!selectedImage ? "hidden" : "block cursor-pointer"}
+          <label className="block">Image:</label>
+          {selectedImage ? (
+            <div className="flex flex-col items-start">
+              <img
+                src={selectedImage instanceof File? URL.createObjectURL(selectedImage) : undefined}
+                alt="Preview"
+                className="w-40 h-40 object-cover mb-2"
+              />
+              <button
+                type="button"
+                className="bg-teal-500 text-white px-4 py-2 rounded cursor-pointer"
+                onClick={() => setSelectedImage(undefined)}
+              >
+                Remove Image
+              </button>
+            </div>
+          ) : (
+            <input
               type="file"
               accept="image/*"
               onChange={handleImageChange}
+              className="border border-white cursor-pointer p-10"
             />
-          </label>
+          )}
         </div>
+        <div className="flex justify-between">
           <button
             className="bg-teal-500 text-white px-4 py-2 rounded cursor-pointer"
             type="submit"
-            disabled={isCreatingMovie || isUploadingImage}
+            disabled={isUpdatingMovie || isUploadingImage}
           >
-            {isCreatingMovie || isUploadingImage ? "Creating..." : "Create Movie"}
+            {isUpdatingMovie || isUploadingImage ? "Updating..." : "Update Movie"}
           </button>
+
+          <button
+            className="bg-teal-500 text-white px-4 py-2 rounded cursor-pointer"
+            type="button"
+            onClick={handleDeleteMovie}
+            disabled={isDeletingMovie}
+          >
+            {isDeletingMovie ? "Deleting" : "Delete Movie"}
+          </button>
+        </div>
       </form>
     </div>
   )
 }
-export default CreateMovie
+export default UpdateMovie;

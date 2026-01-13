@@ -92,15 +92,15 @@ export interface UploadResponse {
 
 /* Request */
 
-export type IReviewRequest = Omit<IReview, "createdAt" | "updatedAt">;
+export type IReviewRequest = Omit<IReview, "id" | "name" | "user" | "createdAt" | "updatedAt">;
 
 export interface MovieRequest {
   name: string;
-  image: string;
+  image?: string;
   year: number;
   details: string;
   cast: string[];
-  reviews: IReviewRequest[];
-  numReviews: number;
+  reviews?: IReviewRequest[];
+  numReviews?: number;
   genre: string;
 }
