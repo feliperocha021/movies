@@ -11,5 +11,6 @@ textarea {
 }
 
 select option {
-  color: black;
+  background-color: black;
+  color: white;
 }

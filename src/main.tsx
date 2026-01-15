@@ -17,6 +17,8 @@ import GenreList from './pages/Admin/GenreList.tsx'
 import CreateMovie from './pages/Admin/CreateMovie.tsx'
 import AdminMoviesList from './pages/Admin/AdminMoviesList.tsx'
 import UpdateMovie from './pages/Admin/UpdateMovie.tsx'
+import AllMovies from './pages/Movies/AllMovies.tsx'
+import MovieDetails from './pages/Movies/MovieDetails.tsx'
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "movies", element: <AllMovies /> },
       {
         element: <PrivateRoute />,
         children: [
@@ -40,6 +43,7 @@ const router = createBrowserRouter([
           { path: "/admin/movies/create", element: <CreateMovie /> },
           { path: "/admin/movies-list", element: <AdminMoviesList /> },
           { path: "/admin/movies/update/:id", element: <UpdateMovie /> },
+          { path: "/movies/:id", element: <MovieDetails /> },
         ]
       },
     ],

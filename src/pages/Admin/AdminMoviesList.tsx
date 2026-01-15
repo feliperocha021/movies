@@ -25,14 +25,14 @@ const AdminMoviesList = () => {
                     <img 
                       src={movie.image} 
                       alt={movie.name} 
-                      className="w-full h-48 object-cover"
+                      className="w-full h-48 object-contain bg-black border"
                     />
                     <div className="px-6 py-4 border border-gray-400">
                       <div className="font-bold text-xl mb-2">
                         {movie.name}
                       </div>
                     </div>
-                    <p className="text-gray-700 text-base">{movie.details}</p>
+                    <p className="text-gray-700 text-base line-clamp-3">{movie.details}</p>
                     <div className="mt-8 mb-4">
                       <Link 
                         to={`/admin/movies/update/${movie.id}`}
