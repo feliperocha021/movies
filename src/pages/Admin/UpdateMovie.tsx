@@ -63,6 +63,7 @@ const UpdateMovie = () => {
     try {
       if (!id) {
         toast.error("Movie Not Found");
+        navigate("/movies");
         return;
       }
 

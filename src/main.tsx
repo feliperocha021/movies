@@ -19,6 +19,8 @@ import AdminMoviesList from './pages/Admin/AdminMoviesList.tsx'
 import UpdateMovie from './pages/Admin/UpdateMovie.tsx'
 import AllMovies from './pages/Movies/AllMovies.tsx'
 import MovieDetails from './pages/Movies/MovieDetails.tsx'
+import AllComments from './pages/Auth/AllComments.tsx'
+import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard.tsx'
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,7 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "movies", element: <AllMovies /> },
+      { path: "/movies/:id", element: <MovieDetails /> },
       {
         element: <PrivateRoute />,
         children: [
@@ -43,7 +46,8 @@ const router = createBrowserRouter([
           { path: "/admin/movies/create", element: <CreateMovie /> },
           { path: "/admin/movies-list", element: <AdminMoviesList /> },
           { path: "/admin/movies/update/:id", element: <UpdateMovie /> },
-          { path: "/movies/:id", element: <MovieDetails /> },
+          { path: "/admin/movies/comments", element: <AllComments /> },
+          { path: "/admin/movies/dashboard", element: <AdminDashboard /> },
         ]
       },
     ],

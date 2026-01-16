@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppDispatch } from "../redux/hooks";
 import { useRefreshMutation } from "../redux/api/authApi";
 import { setCredentials, logout } from "../redux/features/auth/authSlice";
-
-let didRun = false;
 
 export const useAuthBootstrap = () => {
   const dispatch = useAppDispatch();
   const [refresh] = useRefreshMutation();
   const [loading, setLoading] = useState(true);
+  const didRun = useRef(false);
 
   useEffect(() => {
-    if (didRun) return; // evita segunda execução no StrictMode
-    didRun = true;
+    if (didRun.current) return;
+    didRun.current = true;
 
     const controller = new AbortController();
     const refreshSession = async () => {
@@ -29,6 +28,7 @@ export const useAuthBootstrap = () => {
         setLoading(false);
       }
     };
+
     refreshSession();
     return () => controller.abort();
   }, [dispatch, refresh]);

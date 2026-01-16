@@ -59,7 +59,7 @@ export const movieApi = createApi({
 
     createMovieReview: builder.mutation<ReviewResponse, { id: string, newReview: IReviewRequest }>({
       query: ({ id, newReview }) => ({
-        url: `/movies/${id}`,
+        url: `/movies/${id}/reviews`,
         method: "POST",
         body: newReview,
       }),
@@ -67,7 +67,7 @@ export const movieApi = createApi({
     
     updateMovieReview: builder.mutation<ReviewResponse, { id: string, newReview: IReviewRequest }>({
       query: ({ id, newReview }) => ({
-        url: `/movies/${id}`,
+        url: `/movies/${id}/reviews`,
         method: "PUT",
         body: newReview,
       }),

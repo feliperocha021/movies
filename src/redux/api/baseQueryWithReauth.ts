@@ -58,7 +58,9 @@ export const baseQueryWithReauth: typeof baseQuery = async (args, api, extraOpti
         console.warn("Refresh abortado por duplicidade");
       } else {
         console.error("Erro inesperado no refresh:", getErrorMessage(err));
+        console.log("chamando logout");
         api.dispatch(logout());
+        console.log("logout chamado");
       }
     } finally {
       refreshController = null;
